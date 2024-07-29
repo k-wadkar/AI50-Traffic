@@ -1,2 +1,6 @@
 .venv
 gtsrb
+gtsrb-small
+__pycache__
+testee.ppm
+test.py

@@ -9,6 +9,7 @@ from sklearn.model_selection import train_test_split
 EPOCHS = 10
 IMG_WIDTH = 30
 IMG_HEIGHT = 30
+#NUM_CATEGORIES = len(os.listdir(str(sys.argv[1])))
 NUM_CATEGORIES = 43
 TEST_SIZE = 0.4
 
@@ -58,7 +59,21 @@ def load_data(data_dir):
     be a list of integer labels, representing the categories for each of the
     corresponding `images`.
     """
-    raise NotImplementedError
+    images = []
+    labels = []
+
+    for subDirectory in os.listdir(data_dir):
+        subDirectoryPath = os.path.join(data_dir, subDirectory)
+        
+        filesInSubDirectory = [file for file in os.listdir(subDirectoryPath)]
+
+        for file in filesInSubDirectory:
+            imgFilePath = os.path.join(subDirectoryPath, file)
+            
+            images.append(np.asarray(cv2.resize(cv2.imread(imgFilePath), (IMG_WIDTH, IMG_HEIGHT))))
+            labels.append(int(subDirectory))
+
+    return (images, labels)
 
 
 def get_model():
