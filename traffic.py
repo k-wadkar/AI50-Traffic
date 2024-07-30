@@ -2,6 +2,7 @@ import cv2
 import numpy as np
 import os
 import sys
+
 import tensorflow as tf
 
 from sklearn.model_selection import train_test_split
@@ -9,7 +10,7 @@ from sklearn.model_selection import train_test_split
 EPOCHS = 10
 IMG_WIDTH = 30
 IMG_HEIGHT = 30
-#NUM_CATEGORIES = len(os.listdir(str(sys.argv[1])))
+# NUM_CATEGORIES = len(os.listdir(str(sys.argv[1])))
 NUM_CATEGORIES = 43
 TEST_SIZE = 0.4
 
@@ -24,7 +25,7 @@ def main():
     images, labels = load_data(sys.argv[1])
 
     # Split data into training and testing sets
-    labels = tf.keras.utils.to_categorical(labels)
+    labels = tf.keras.utils.to_categorical(labels, num_classes=NUM_CATEGORIES)
     x_train, x_test, y_train, y_test = train_test_split(
         np.array(images), np.array(labels), test_size=TEST_SIZE
     )
@@ -82,7 +83,32 @@ def get_model():
     `input_shape` of the first layer is `(IMG_WIDTH, IMG_HEIGHT, 3)`.
     The output layer should have `NUM_CATEGORIES` units, one for each category.
     """
-    raise NotImplementedError
+    model = tf.keras.models.Sequential()
+    
+    # Conv and max pooling layers
+    model.add(tf.keras.layers.Input(shape=(30, 30, 3)))
+    model.add(tf.keras.layers.Conv2D(32, (3, 3), activation='relu'))
+    model.add(tf.keras.layers.MaxPool2D(pool_size=(2, 2)))
+    
+    # Flattening for input into dense layers
+    model.add(tf.keras.layers.Flatten())
+    
+    # Dense layers
+    model.add(tf.keras.layers.Dense(64, activation='relu'))
+    model.add(tf.keras.layers.Dropout(0.25))
+    model.add(tf.keras.layers.Dense(64, activation='relu'))
+    model.add(tf.keras.layers.Dropout(0.25))
+    
+    # Output layer
+    model.add(tf.keras.layers.Dense(NUM_CATEGORIES, activation='softmax'))
+
+    model.compile(
+        optimizer="adam",
+        loss="categorical_crossentropy",
+        metrics=["accuracy"]
+    )
+
+    return model
 
 
 if __name__ == "__main__":
