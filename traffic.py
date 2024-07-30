@@ -10,8 +10,8 @@ from sklearn.model_selection import train_test_split
 EPOCHS = 10
 IMG_WIDTH = 30
 IMG_HEIGHT = 30
-# NUM_CATEGORIES = len(os.listdir(str(sys.argv[1])))
-NUM_CATEGORIES = 43
+NUM_CATEGORIES = len(os.listdir(str(sys.argv[1])))
+# NUM_CATEGORIES = 43
 TEST_SIZE = 0.4
 
 
@@ -25,7 +25,7 @@ def main():
     images, labels = load_data(sys.argv[1])
 
     # Split data into training and testing sets
-    labels = tf.keras.utils.to_categorical(labels, num_classes=NUM_CATEGORIES)
+    labels = tf.keras.utils.to_categorical(labels) #, num_classes=NUM_CATEGORIES)
     x_train, x_test, y_train, y_test = train_test_split(
         np.array(images), np.array(labels), test_size=TEST_SIZE
     )
@@ -44,6 +44,7 @@ def main():
         filename = sys.argv[2]
         model.save(filename)
         print(f"Model saved to {filename}.")
+        model.summary()
 
 
 def load_data(data_dir):
@@ -85,20 +86,27 @@ def get_model():
     """
     model = tf.keras.models.Sequential()
     
-    # Conv and max pooling layers
-    model.add(tf.keras.layers.Input(shape=(30, 30, 3)))
-    model.add(tf.keras.layers.Conv2D(32, (3, 3), activation='relu'))
+    # Input layer
+    model.add(tf.keras.layers.Input(shape=(IMG_HEIGHT, IMG_WIDTH, 3)))
+    # 3x Conv and max pooling layers
+    model.add(tf.keras.layers.Conv2D(64, (3, 3), activation='relu'))
     model.add(tf.keras.layers.MaxPool2D(pool_size=(2, 2)))
-    
+    model.add(tf.keras.layers.Conv2D(128, (2, 2), activation='relu'))
+    model.add(tf.keras.layers.MaxPool2D(pool_size=(2, 2)))
+    # model.add(tf.keras.layers.Conv2D(32, (3, 3), activation='relu'))
+
     # Flattening for input into dense layers
     model.add(tf.keras.layers.Flatten())
     
-    # Dense layers
-    model.add(tf.keras.layers.Dense(64, activation='relu'))
+    # 2xDense layers
+    # model.add(tf.keras.layers.Dense(128, activation='relu'))
+    # model.add(tf.keras.layers.Dropout(0.5))
     model.add(tf.keras.layers.Dropout(0.25))
-    model.add(tf.keras.layers.Dense(64, activation='relu'))
-    model.add(tf.keras.layers.Dropout(0.25))
+    # model.add(tf.keras.layers.Dense(64, activation='relu'))
     
+    # model.add(tf.keras.layers.Dense(64, activation='relu'))
+    # model.add(tf.keras.layers.Dropout(0.25))
+
     # Output layer
     model.add(tf.keras.layers.Dense(NUM_CATEGORIES, activation='softmax'))
 

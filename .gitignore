@@ -1,5 +1,4 @@
 .venv
-gtsrb
-gtsrb-small
+Data
 __pycache__
 generated-models
